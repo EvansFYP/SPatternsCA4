@@ -1,0 +1,111 @@
+
+<head>
+    {% load static %}
+    <title>{{ item.name }} Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 100vh;
+            color: #333;
+        }
+
+        .details {
+            width: 60%;
+            padding-right: 20px;
+            padding-right: 50px;
+            padding-top: 60px;
+            background-color: rgba(255, 255, 255, 0.8);  
+            border-radius: 10px; 
+            padding: 30px; 
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);  
+        }
+
+        .image-container {
+            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 40px;
+            color: #333;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);  
+        }
+
+        p {
+            font-size: 24px;
+            color: #171515;
+            margin: 5px 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);  
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+
+        .buttons-container {
+            margin-top: 20px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="details">
+        <h1>{{ item.name }}</h1>
+        <p><b>Title: </b> {{ item.title}}</p>
+        <p><b>Category: </b> {{ item.category }}</p>
+        <p><b>Author: </b>{{ item.author }}</p>
+        <p><b>Publisher:</b> {{ item.publisher }}</p>
+        <p><b>Isbn: </b>{{ item.isbn_number }}</p>
+        <p><b>Stock:</b> {{ item.stock_quantity }}</p>
+        <p><b>Price:</b> {{ item.price }}</p>
+
+        <div class="image-container">
+            <img src="{{ item.image.url }}" alt="{{ item.name }}" />
+        </div>
+
+        <div class="buttons-container">
+            {% if user.is_staff %}
+                <a href="{% url 'onlinelibrary:deleteitem' item.id %}" onclick="return confirm('Are you sure you want to delete this item?');">Delete Item</a>
+                <a href="{% url 'onlinelibrary:edititem' item.id %}">Edit Item</a>
+            {% endif %}
+        </div>
+
+        <div class="buttons-container">
+            <a href="{% url 'onlinelibrary:viewitem' %}">Back to Wardrobe</a>
+            <a href="{% url 'onlinelibrary:home' %}">Back to Home</a>
+        </div>
+
+
+    </div>
+
+   
+</body>
+</html>

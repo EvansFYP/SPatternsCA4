@@ -1,0 +1,103 @@
+{% load static %}
+<head>
+   
+    <title>Your Wardrobe</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    text-align: center;
+     padding: 20px;
+           
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh;
+    color: #333;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .wardrobe-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            margin-top: 20px;
+        }
+
+        .wardrobe-items a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .item-button {
+            border: none;
+            background: none;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .item-button:hover {
+            transform: scale(1.05);
+        }
+
+        .item-button img {
+            width: 150px;
+            height: 150px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .item-button p {
+            font-size: 16px;
+            color: #333;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px;
+            background-color: #e76f51;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #caddf2;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Books <br>  <h2>Click on books to view their full details and purchase!</h2> </h1>
+   
+    <div>
+        {% for item in items %}
+        <a href="{% url 'onlinelibrary:itemdetail' item.id %}">  
+        <button style="border:none; background: none;">
+        <img src="{{ item.image.url }}" alt="{{ item.name }}" width="150" height="150"/>
+        <p>{{ item.name }}</p>
+        </button>
+        </a>
+        {% endfor %}
+    </div>
+    <a href="{% url 'onlinelibrary:home' %}">Back to Home</a>
+</body>
+</html>

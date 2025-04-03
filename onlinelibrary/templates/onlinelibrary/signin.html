@@ -1,11 +1,16 @@
-<form action = "{%url 'onlinelibrary:signin' %}" method = "post">
-    {% csrf_token %}
-    <fieldset>
-        <legend> <h1>  Sign In </h1></legend>
-        Please enter your username:
-        <input type = "text" name = "Username"/> <br>
-        Please enter your password:
-        <input type = "text" name = "Password"/>
-    </fieldset> <br>
-    <input type = "submit" value ="sign in">
-</form>
+<body>
+    <form action="{% url 'onlinelibrary:signin' %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>Sign In</h1></legend>
+            
+            <label for="username">Please enter your username:</label>
+            <input type="text" name="username" id="username" required/>
+
+            <label for="password">Please enter your password:</label>
+            <input type="password" name="password" id="password" required/>
+        </fieldset>
+        
+        <input type="submit" value="Sign In">
+    </form>
+</body> 

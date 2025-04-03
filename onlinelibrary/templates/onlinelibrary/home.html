@@ -1,5 +1,41 @@
 {% load static %}
+<style>
+    .button-wrapper {
+        text-align: center;
+        width: 250px;
+        transition: transform 0.3s ease;
+    }
 
+    .button-wrapper:hover {
+        transform: scale(1.05);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.8); 
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    
+    .button-wrapper .button img {
+        width: 50px;  
+        height: 50px;  
+        object-fit: cover;  
+    }
+</style>
+</Style>
 
 
 User signed in as {{request.user}}
@@ -7,15 +43,33 @@ User signed in as {{request.user}}
 <form action = "{%url 'onlinelibrary:home' %}" method = "post">
     {% csrf_token %}
     <div class="container">
-                <p>View available books in the library</p>
-            </div>
+        <div class="button-container">
+    
             <div class="button-wrapper">
-                <a href="{% url 'onlinelibrary:homeview' %}" class="button">
+                <p>View available books in the library</p>
+                <a href="{% url 'onlinelibrary:viewitem' %}" class="button">
                     <img src="{% static 'bookicon.png' %}" alt="View Available Books" />
                 </a>
             </div>
+            </div>
+
+        
+
+          
+        
         </div>
+
+        {% if user.is_staff %}
+        <div class="container">
+            <div class="button-container">
+        <div class="button-wrapper">
+                   
+            <a href="{% url 'onlinelibrary:additem' %}">Add a book</a>
+     
     </div>
+</div>
+</div>
+{% endif %}
 
     
 </body>
