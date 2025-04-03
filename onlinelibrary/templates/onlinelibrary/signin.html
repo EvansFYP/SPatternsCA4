@@ -1,0 +1,11 @@
+<form action = "{%url 'onlinelibrary:signin' %}" method = "post">
+    {% csrf_token %}
+    <fieldset>
+        <legend> <h1>  Sign In </h1></legend>
+        Please enter your username:
+        <input type = "text" name = "Username"/> <br>
+        Please enter your password:
+        <input type = "text" name = "Password"/>
+    </fieldset> <br>
+    <input type = "submit" value ="sign in">
+</form>

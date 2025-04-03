@@ -1,0 +1,81 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(to right, #74ebd5, #9face6);
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+        form {
+            background-color: white;
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            width: 300px; 
+        }
+        h1 {
+            text-align: center; 
+            color: #333; 
+        }
+        input[type="text"], input[type="password"] {
+            width: 90%; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 5px;
+        input[type="submit"] {
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: 100%; 
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3; 
+        } }
+    </style>
+</head>
+<body>
+
+<form action="{% url 'onlinelibrary:signup' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend>
+            <h1>Sign Up</h1>
+        </legend>
+        <label>Please enter your Username:</label><br>
+        <input type="text" name="Username" required/><br>
+        
+        <label>Please enter your Email:</label><br>
+        <input type="text" name="Email" required/><br>
+        
+        <label>Please enter your Password:</label><br>
+        <input type="password" name="Password" required/><br>
+
+        <label>Please enter your Address: </label><br>
+        <input type="text" name="Address" required/><br>
+
+        <label>Please select your Payment Method:</label><br>
+
+        <input type="radio" id="visa" name="payment_method" value="Visa" required>
+        <label for="visa">Visa</label><br>
+        
+        <input type="radio" id="mastercard" name="payment_method" value="MasterCard">
+        <label for="mastercard">MasterCard</label><br>
+    </fieldset>
+    <input type="submit" value="Sign Up">
+</form>
+
+</body>
+
+</html>

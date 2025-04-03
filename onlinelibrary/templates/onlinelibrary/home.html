@@ -1,0 +1,21 @@
+{% load static %}
+
+
+
+User signed in as {{request.user}}
+
+<form action = "{%url 'onlinelibrary:home' %}" method = "post">
+    {% csrf_token %}
+    <div class="container">
+                <p>View available books in the library</p>
+            </div>
+            <div class="button-wrapper">
+                <a href="{% url 'onlinelibrary:homeview' %}" class="button">
+                    <img src="{% static 'bookicon.png' %}" alt="View Available Books" />
+                </a>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
