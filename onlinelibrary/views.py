@@ -75,7 +75,7 @@ def additem(request):
         context = {} 
         return render(request, "onlinelibrary/additem.html", context)
     else:
-        title = request.POST["title"]
+        title = request.POST["title"] 
         author = request.POST["author"]
         publisher = request.POST["publisher"]
         category = request.POST["category"]
@@ -99,24 +99,26 @@ def additem(request):
         )
 
     
-        return HttpResponseRedirect(reverse("webapp:viewitem", kwargs={"item_id": new_book.id}))
+        return HttpResponseRedirect(reverse("onlinelibrary:itemdetail", kwargs={"item_id": new_book.id}))
         
  
 def viewitem(request):
     items = Book.objects.all()  
     context ={'items': items }
-    return render(request, 'onlinelibrary/viewitem.html',context)
+    return render(request, 'onlinelibrary/booklist.html',context)
 
 
 def itemdetail(request, item_id):
     item = get_object_or_404(Book, id=item_id)
+    related_books = Book.objects.filter(author=item.author).exclude(id=item.id)[:5]
 
     context = { 
         'item': item,
+        'related_books': related_books,
     }
     
     
-    return render(request, 'onlinelibrary/bookdetail.html', context)
+    return render(request, 'onlinelibrary/itemdetail.html', context)
 
 
 def deleteitem(request, item_id):
@@ -128,21 +130,42 @@ def deleteitem(request, item_id):
 def edititem(request, item_id):
     item = get_object_or_404(Book, id=item_id)
     
-
     if request.method == "POST":
+        # Update all fields
+        
+        item.title = request.POST.get("title", item.title)
+        item.author = request.POST.get("author", item.author)
+        item.publisher = request.POST.get("publisher", item.publisher)
+        item.category = request.POST.get("category", item.category)
+        item.price = request.POST.get("price", item.price)
+        item.isbn_number = request.POST.get("isbn_number", item.isbn_number)
+        item.stock_quantity = request.POST.get("stock_quantity", item.stock_quantity)
+        
        
-       item.title = request.POST["title"]
-       item.author = request.POST["author"]
-       item.publisher = request.POST["publisher"]
-       item.category = request.POST["category"]
-       item.price = request.POST["price"]
-       item.isbn_number = request.POST["isbn_number"]
-       item.stock_quantity = request.POST["stock_quantity"]
-       item.image = request.FILES.get("image", item.image)  
-
+        if 'image' in request.FILES:
+            item.image = request.FILES['image']
         
-        
-       item.save()
+        item.save()
+        return redirect('onlinelibrary:itemdetail', item_id=item.id)  # Redirect to detail view after edit
+    
 
-      
-    return redirect('webapp:viewitem')
+    categories = [  
+        ('FICTION', 'Fiction'),
+        ('NONFICTION', 'Non-Fiction'),
+        ('SCIENCE', 'Science'),
+        ('HISTORY', 'History'),
+        ('BIOGRAPHY', 'Biography'),
+        ('MYSTERY', 'Mystery'),
+        ('FANTASY', 'Fantasy'),
+        ('ROMANCE', 'Romance'),
+        ('THRILLER', 'Thriller'),
+        ('SELFHELP', 'Self-Help'),
+        ('COOKING', 'Cooking'),
+       
+        
+       
+    ]
+    return render(request, 'onlinelibrary/edititem.html', {
+        'item': item,
+        'categories': categories
+    })

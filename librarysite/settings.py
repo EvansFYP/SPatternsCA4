@@ -16,8 +16,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.join(BASE_DIR, "keys", "extreme-splicer-444517-j5-37d3ad999454.json")
 # Media configuration
+
+# OR use os.path consistently:
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  # Use Path for consistency
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 
 # Quick-start development settings - unsuitable for production

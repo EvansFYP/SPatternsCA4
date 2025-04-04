@@ -1,5 +1,5 @@
 {% load static %}
-<head>
+
    
     <title>Your Wardrobe</title>
     <style>
@@ -16,6 +16,35 @@
     height: 100vh;
     color: #333;
         }
+
+
+        ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #e76f51;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #efdede;
+}
+
+.active {
+  background-color: #e76f51;
+}
 
         h1 {
             font-size: 36px;
@@ -84,20 +113,31 @@
             background-color: #caddf2;
         }
     </style>
-</head>
+    <head>
+        <ul>
+            <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
+            <li><a class="active" href="{% url 'onlinelibrary:home' %}">Home</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#about">About</a></li>
+            </ul>
+    </head>
+  
 <body>
+  
+
     <h1>All Books <br>  <h2>Click on books to view their full details and purchase!</h2> </h1>
    
     <div>
         {% for item in items %}
         <a href="{% url 'onlinelibrary:itemdetail' item.id %}">  
         <button style="border:none; background: none;">
-        <img src="{{ item.image.url }}" alt="{{ item.name }}" width="150" height="150"/>
+        <img src="{{ item.image.url }}" alt="{{ item.title }}" width="150" height="200"/>
         <p>{{ item.name }}</p>
         </button>
         </a>
         {% endfor %}
     </div>
-    <a href="{% url 'onlinelibrary:home' %}">Back to Home</a>
+    
 </body>
+
 </html>

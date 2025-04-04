@@ -34,11 +34,47 @@
         height: 50px;  
         object-fit: cover;  
     }
+
+
+  
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #e76f51;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #efdede;
+}
+
+.active {
+  background-color: #e76f51;
+}
 </style>
-</Style>
+
+<body>
+<ul>
+<li><a href="#user">User  : Signed in as {{request.user}}</a></li>
+<li><a class="active" href="#home">Home</a></li>
+<li><a href="#Search">Search Books</a></li>
+<li><a href="#Cart">Shopping Cart</a></li>
+</ul>
 
 
-User signed in as {{request.user}}
 
 <form action = "{%url 'onlinelibrary:home' %}" method = "post">
     {% csrf_token %}
@@ -46,7 +82,7 @@ User signed in as {{request.user}}
         <div class="button-container">
     
             <div class="button-wrapper">
-                <p>View available books in the library</p>
+              <h3>  <p>View available books in the library</p></h3>
                 <a href="{% url 'onlinelibrary:viewitem' %}" class="button">
                     <img src="{% static 'bookicon.png' %}" alt="View Available Books" />
                 </a>
@@ -63,8 +99,11 @@ User signed in as {{request.user}}
         <div class="container">
             <div class="button-container">
         <div class="button-wrapper">
-                   
-            <a href="{% url 'onlinelibrary:additem' %}">Add a book</a>
+       
+            <p><h3>Add new books to the library</h3></p>  
+            <a href="{% url 'onlinelibrary:additem' %}" class="button">
+            <img src="{% static 'bookiconplus.png' %}" alt="Add new books" />
+        </a>
      
     </div>
 </div>

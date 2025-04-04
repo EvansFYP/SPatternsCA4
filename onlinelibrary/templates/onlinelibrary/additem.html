@@ -1,0 +1,146 @@
+<html>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background-size: cover;
+         background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        height: 100vh;
+        color: #333;
+        }
+    
+        form {
+            background-color: white; 
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1); 
+            width: 100%;
+            max-width: 800px; 
+            text-align: center;
+            margin: 30px 0;
+        }
+    
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    
+        label {
+            display: block;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+    
+        input[type="file"] {
+            padding: 6px;
+        }
+    
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    
+        fieldset {
+            border: none;
+        }
+    
+        fieldset input,
+        fieldset select {
+            margin-bottom: 15px;
+        }
+    
+        legend {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
+
+
+<head> 
+<body>
+    <form action="{% url 'onlinelibrary:additem' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>Add Book</h1></legend>
+            
+            <label>Please upload an image:</label>
+            <input type="file" name="image" accept="image/*"/><br>
+
+            <label>Please enter the Book title:</label>
+            <input type="text" name="title" required /> <br>
+
+            <label for="category">Please select a category:</label>
+            <select name="category" id="category" required>
+                <option value="">Select a category</option>
+                <option value="FANTASY">Fantasy</option>
+                <option value="ROMANCE">Romance</option>
+                <option value="THRILLER">Thriller</option>
+                <option value="MYSTERY">Mystery</option>
+                <option value="BIOGRAPHY">Biography</option>
+                <option value="HISTORY">History</option>
+                <option value="SCIENCE_FICTION">Science Fiction</option>
+                <option value="NON_FICTION">Non-Fiction</option>
+                <option value="SELF_HELP">Self Help</option>
+                <option value="COOKING">Cooking</option>
+            </select> <br>
+
+
+            <label>Please enter the Book's author:</label>
+            <input type="text" name="author" required />
+              
+            </select> <br>
+
+            <label>Please enter the Book's publisher:</label>
+            <input type="text" name="publisher" required /><br>
+
+            <label>Please enter the Book's ISBN:</label>
+            <input type="text" name="isbn_number" required /><br>
+ 
+            <label>Please enter the Book's price:</label>
+            <input type="number" name="price" required /><br>
+
+
+            <label>Please enter the Book's available stock:</label>
+            <input type="number" name="stock_quantity" required />
+        </fieldset> <br>
+
+        <input type="submit" value="Add Item">
+    </form>
+</body>
+</html>

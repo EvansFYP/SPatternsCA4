@@ -1,0 +1,43 @@
+<html>
+
+<body>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <fieldset>
+            <legend>Edit and confirm Book {{ item.title }}</legend>
+
+           
+
+                Category:
+                <select name="category" id="category" required>
+                    {% for value, display in categories %}
+                        <option value="{{ value }}" {% if value == item.category %} selected {% endif %}>{{ display }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <div>
+                Stock:
+                <input type="number" name="stock_quantity" value="{{ item.stock_quantity }}" required />
+            </div>
+
+            <div>
+                Price:
+                <input type="number" name="price" value="{{ item.price }}" required />
+
+            </div>
+
+            <div>
+                <label for="image">Image:</label>
+                <input type="file" name="image" accept="image/*" />
+                <p>Current image: <img src="{{ item.image.url }}" alt="{{ item.name }}" width="100" /></p>
+            </div>
+
+            <button type="submit">Update/Confirm Item</button> <br> <br>
+            <a href="{% url 'onlinelibrary:itemdetail' item.id %}">Back to Item Details</a>
+        </fieldset>
+    </form>
+</body>
+</html>
