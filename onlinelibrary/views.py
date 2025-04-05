@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -5,6 +6,15 @@ from django.views import generic
 from django.contrib.auth import login, authenticate
 from .models import AbstractUser
 from django.contrib.auth.models import User
+from .factories import BookFactory  
+from .cart_service import CartService
+from .cart_service import CartService
+from .cart_commands import AddToCartCommand, ClearCartCommand
+from .cart_invoker import CartInvoker
+
+from django.contrib.auth.signals import user_logged_out, user_logged_in
+from django.contrib.auth import logout
+from django.dispatch import receiver
 
 from .models import UserProfile, Book, BookTransaction 
 
@@ -58,6 +68,17 @@ def signin(request):
             return redirect(reverse("onlinelibrary:home")) 
         else:
             return render(request, "onlinelibrary/signin.html", {"error": "Invalid credentials."})
+        
+def custom_logout(request):
+    
+    if request.user:
+        cart_service.clear_cart(request.user)
+
+ 
+    logout(request)
+
+   
+    return redirect('onlinelibrary:home')
 
 def home(request): 
     if request.method == "GET":
@@ -70,36 +91,17 @@ def home(request):
          return HttpResponseRedirect(reverse("onlinelibrary:home"))
     
 
+
+
 def additem(request):
     if request.method == "GET":
-        context = {} 
-        return render(request, "onlinelibrary/additem.html", context)
+        return render(request, "onlinelibrary/additem.html", {})
+
     else:
-        title = request.POST["title"] 
-        author = request.POST["author"]
-        publisher = request.POST["publisher"]
-        category = request.POST["category"]
-        price = request.POST["price"]
-        isbn_number = request.POST["isbn_number"]
-        stock_quantity = request.POST["stock_quantity"]
-        image = request.FILES.get("image", None)
+        image = request.FILES.get("image")
+        new_book = BookFactory.create_book(request.POST, image) ##simple factory
 
-
-        ## Create Book object
-        new_book = Book.objects.create(
-           
-            category=category,
-            title=title,
-            author=author,
-            publisher=publisher,
-            price=price,
-            isbn_number=isbn_number,
-            stock_quantity=stock_quantity,
-            image=image,
-        )
-
-    
-        return HttpResponseRedirect(reverse("onlinelibrary:itemdetail", kwargs={"item_id": new_book.id}))
+        return redirect("onlinelibrary:itemdetail", item_id=new_book.id)
         
  
 def viewitem(request):
@@ -131,7 +133,7 @@ def edititem(request, item_id):
     item = get_object_or_404(Book, id=item_id)
     
     if request.method == "POST":
-        # Update all fields
+        
         
         item.title = request.POST.get("title", item.title)
         item.author = request.POST.get("author", item.author)
@@ -169,3 +171,54 @@ def edititem(request, item_id):
         'item': item,
         'categories': categories
     })
+
+
+
+
+cart_service = CartService()
+
+def add_to_cart(request, item_id):
+    book = get_object_or_404(Book, id=item_id)
+    user = request.user  
+    # create the AddToCartCommand
+    add_command = AddToCartCommand(cart_service, user, book)
+
+    # create an Invoker and execute the command
+    invoker = CartInvoker()  
+    invoker.execute_command(add_command)  # executes the command through the invoker
+
+ 
+    return redirect('onlinelibrary:view_cart')
+
+
+
+
+def clear_cart(request):
+    user = request.user  
+
+    clear_command = ClearCartCommand(cart_service, user)
+
+    # create an Invoker and execute the command
+    invoker = CartInvoker()  
+    invoker.execute_command(clear_command)  #execute the command through the invoker
+
+ 
+    return redirect('onlinelibrary:view_cart') 
+
+
+
+def view_cart(request):
+    user = request.user
+    cart_items = cart_service.get_cart_items(user)
+    
+    total_price = sum(item.price_at_transaction for item in cart_items if item.price_at_transaction)
+
+    return render(request, 'onlinelibrary/cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
+
+
+
+
+##WRITE REMOVE BOOK FROM CART FOR THE COMMAND PATTERN AND ALSO IN CART SERVICE

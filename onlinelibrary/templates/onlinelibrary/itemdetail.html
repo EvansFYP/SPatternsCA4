@@ -144,6 +144,11 @@
         
     
         <div class="buttons-container">
+            
+            <form method="post" action="{% url 'onlinelibrary:add_to_cart' item.id %}">
+                {% csrf_token %}
+                <button type="submit">Add to Cart</button>
+            </form>
         
             <a href="{% url 'onlinelibrary:viewitem' %}">Back to Book List</a>
             <a href="{% url 'onlinelibrary:home' %}">Back to Home</a>

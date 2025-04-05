@@ -15,5 +15,9 @@ path("viewitem/", views.viewitem, name ="viewitem"),
 path('itemdetail/<int:item_id>/', views.itemdetail, name='itemdetail'),
 path('item/delete/<int:item_id>/', views.deleteitem, name='deleteitem'),
 path('item/edit/<int:item_id>/', views.edititem, name='edititem'),
+path('add-to-cart/<int:item_id>/', views.add_to_cart, name='add_to_cart'),
+path('cart/', views.view_cart, name='view_cart'),
+path('cart/clear/', views.clear_cart, name='clear_cart'),
+path('logout/', views.custom_logout, name='logout'),
 
 ]

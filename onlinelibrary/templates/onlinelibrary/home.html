@@ -69,6 +69,7 @@ li a:hover:not(.active) {
 <body>
 <ul>
 <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
+<li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
 <li><a class="active" href="#home">Home</a></li>
 <li><a href="#Search">Search Books</a></li>
 <li><a href="#Cart">Shopping Cart</a></li>
