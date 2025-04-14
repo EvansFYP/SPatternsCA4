@@ -1,0 +1,17 @@
+<h2>Your Purchase History</h2>
+
+{% if transactions %}
+    <ul>
+        {% for transaction in transactions %}
+            <li>
+                <strong>{{ transaction.book.title }}</strong> — 
+                Quantity: {{ transaction.quantity }}<br>
+                Purchased on: {{ transaction.transaction_date|date:"M d, Y H:i" }}<br>
+
+                <a href="{% url 'submit_review' transaction.book.id %}">Leave a Review</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't purchased any books yet.</p>
+{% endif %}

@@ -20,13 +20,13 @@ class AddToCartCommand(CartCommand):
 
 
 class RemoveFromCartCommand(CartCommand):
-    def __init__(self, cart_service, user, book):
+    def __init__(self, cart_service, user, cart_item_id):
         self.cart_service = cart_service
         self.user = user
-        self.book = book
+        self.cart_item_id = cart_item_id
 
     def execute(self):
-        self.cart_service.remove_from_cart(self.user, self.book)
+        return self.cart_service.remove_from_cart(self.user, self.cart_item_id)
 
 
 

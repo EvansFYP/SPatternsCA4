@@ -1,0 +1,74 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Purchase</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #e76f51;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #e76f51;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f4a261;
+        }
+
+        .info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #e76f51;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h2>Confirm Your Purchase</h2>
+
+    <div class="info">
+        <p><strong>Shipping to:</strong><br>{{ user.address }}</p>
+        <p><strong>Payment Method:</strong> {{ user.payment_method|title }}</p>
+    </div>
+
+    <form method="post" action="{% url 'onlinelibrary:finalise_purchase' %}" onsubmit="validateCardNumber(event)">
+        {% csrf_token %}
+
+        <label for="card_number">Enter Your {{ user.payment_method|title }} Card Number:</label>
+        <input type="text" name="card_number" id="card_number" placeholder="e.g. 4111 1111 1111 1111" required>
+        <p class="error" id="error_msg"></p>
+
+        <button type="submit">Confirm Purchase</button>
+    </form>
+</body>
+</html>

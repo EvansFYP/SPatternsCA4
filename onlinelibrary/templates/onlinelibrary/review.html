@@ -1,0 +1,33 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Your Purchase</title>
+</head>
+<body>
+    <h1>Rate Your Purchase</h1>
+    <h3>Book: {{ book.title }}</h3>
+
+    <p>How would you rate this book?</p>
+
+    <form method="POST" action="{% url 'submit_review' book.id %}">
+        {% csrf_token %}
+        <label for="rating">Rating (1 to 5):</label>
+        <select name="rating" id="rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <br><br>
+        <label for="review_text">Your Review (optional):</label>
+        <textarea name="review_text" id="review_text" rows="4" cols="50"></textarea>
+
+        <br><br>
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <p><a href="{% url 'book_details' book.id %}">Back to Book Details</a></p>
+</body>
+</html>

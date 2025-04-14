@@ -39,15 +39,22 @@ class CartService:
 
 
 
-    def remove_from_cart(self, user, book):
+    def remove_from_cart(self, user, cart_item_id):
+  
+      try:
+         cart_item = BookTransaction.objects.get(
+             id=cart_item_id,
+             user=user,
+             status="ACTIVE",
+             transaction_type="purchase"
+        )
         
-        cart_item = BookTransaction.objects.filter(user=user, book=book, status="ACTIVE").first()
-        
-        if cart_item:
-            # If there's more than 1 of this item, decrease the quantity
-            if cart_item.quantity > 1:
-                cart_item.quantity -= 1
-                cart_item.save()
-            else:
-                # If there's only one item, delete it from the cart
-                cart_item.delete()
+         if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+         else:
+            cart_item.delete()
+            
+         return True
+      except BookTransaction.DoesNotExist:
+         return False

@@ -71,10 +71,12 @@ li a:hover:not(.active) {
 <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
 <li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
 <li><a class="active" href="#home">Home</a></li>
-<li><a href="#Search">Search Books</a></li>
-<li><a href="#Cart">Shopping Cart</a></li>
+<li><a href="{% url 'onlinelibrary:viewitem' %}">View Books</a></li>
+<li><a href="{% url 'onlinelibrary:view_cart' %}">Shopping Cart</a></li>
+<li><a href="{% url 'onlinelibrary:loyalty_page' %}">Loyalty Rewards</a></li>
+<li><a href="{% url 'onlinelibrary:purchase_history' %}">Purchase History</a></li>
 </ul>
-
+ 
 
 
 <form action = "{%url 'onlinelibrary:home' %}" method = "post">
@@ -110,6 +112,12 @@ li a:hover:not(.active) {
 </div>
 </div>
 {% endif %}
-
-    
+<br> <br>
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 </body>

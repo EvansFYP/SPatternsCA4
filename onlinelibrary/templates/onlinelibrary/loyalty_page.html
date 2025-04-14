@@ -1,0 +1,31 @@
+<html>
+
+<head>
+
+    <title>Loyalty Page</title>
+</head>
+<body>
+    <h1>Welcome to Your Loyalty Page</h1>
+    <p>You have made {{ user_profile.loyalty_count }} purchases.</p>
+
+    <h3>Your Loyalty Progress:</h3>
+    <ul>
+        {% for i in loyalty_progress %}
+            {% if i <= user_profile.loyalty_count %}
+                <li>✔ Purchase {{ i }}</li>
+            {% else %}
+                <li>❌ Purchase {{ i }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    {% if free_book_button %}
+        <form method="POST" action="{% url 'redeem_free_book' %}">
+            {% csrf_token %}
+            <button type="submit">Redeem Your Free Book</button>
+        </form>
+    {% else %}
+        <p>Keep buying books to reach 10 and get a free book!</p>
+    {% endif %}
+</body>
+</html>

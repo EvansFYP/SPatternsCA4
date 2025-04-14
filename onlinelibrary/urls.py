@@ -21,6 +21,9 @@ path('cart/clear/', views.clear_cart, name='clear_cart'),
 path('logout/', views.custom_logout, name='logout'),
 path("search/", views.search_books, name="search"),
 path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
-
-
+path('finalise_purchase/', views.finalise_purchase, name='finalise_purchase'),
+path('loyalty/', views.loyalty_page, name='loyalty_page'),
+path('purchase-history/', views.purchase_history, name='purchase_history'),
+path('review/<int:book_id>/', views.submit_review, name='submit_review'),
+ 
 ]
