@@ -37,3 +37,7 @@ class ClearCartCommand(CartCommand):
 
     def execute(self):
         self.cart_service.clear_cart(self.user)
+
+
+
+

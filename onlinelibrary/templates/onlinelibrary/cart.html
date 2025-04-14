@@ -4,7 +4,11 @@
     <ul>
         {% for item in cart_items %}
             <li>
-                <strong>{{ item.book.title }}</strong> — €{{ item.price_at_transaction }}
+                <strong>{{ item.book.title }}</strong> — €{{ item.price_at_transaction }} (x{{ item.quantity }})
+                <form method="post" action="{% url 'onlinelibrary:remove_from_cart' item.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Remove from Cart</button>
+                </form>
             </li>
         {% endfor %}
     </ul>

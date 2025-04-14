@@ -9,16 +9,21 @@ from django.contrib.auth.models import User
 from .factories import BookFactory  
 from .cart_service import CartService
 from .cart_service import CartService
-from .cart_commands import AddToCartCommand, ClearCartCommand
-from .cart_invoker import CartInvoker
-
+from .cart_commands import AddToCartCommand, ClearCartCommand, RemoveFromCartCommand
+from .cart_invoker import CartInvoker 
+from django.db.models import Q
 from django.contrib.auth.signals import user_logged_out, user_logged_in
 from django.contrib.auth import logout
 from django.dispatch import receiver
+from django.db.models.signals import post_save
+from .filters import FILTER_STRATEGIES
+
 
 from .models import UserProfile, Book, BookTransaction 
 
   
+
+
 
 def signup(request):
     if request.method == "GET":
@@ -198,9 +203,9 @@ def clear_cart(request):
 
     clear_command = ClearCartCommand(cart_service, user)
 
-    # create an Invoker and execute the command
+    
     invoker = CartInvoker()  
-    invoker.execute_command(clear_command)  #execute the command through the invoker
+    invoker.execute_command(clear_command) 
 
  
     return redirect('onlinelibrary:view_cart') 
@@ -211,7 +216,12 @@ def view_cart(request):
     user = request.user
     cart_items = cart_service.get_cart_items(user)
     
-    total_price = sum(item.price_at_transaction for item in cart_items if item.price_at_transaction)
+    #  total price
+    total_price = 0
+
+    # considering quantity
+    for item in cart_items:
+        total_price += item.price_at_transaction * item.quantity
 
     return render(request, 'onlinelibrary/cart.html', {
         'cart_items': cart_items,
@@ -221,4 +231,36 @@ def view_cart(request):
 
 
 
-##WRITE REMOVE BOOK FROM CART FOR THE COMMAND PATTERN AND ALSO IN CART SERVICE
+def remove_from_cart(request, item_id):
+    book = get_object_or_404(Book, id=item_id)
+    user = request.user
+
+    
+    remove_command = RemoveFromCartCommand(cart_service, user, book)
+
+   
+    invoker = CartInvoker()
+    invoker.execute_command(remove_command)  
+
+    return redirect('onlinelibrary:view_cart')
+
+#Strategy Pattern
+def search_books(request):
+    query = request.GET.get("query", "")
+    field = request.GET.get("field", "title")
+    sort = request.GET.get("sort", "title")
+
+    items = Book.objects.all()
+
+    if query and field in FILTER_STRATEGIES:
+        strategy = FILTER_STRATEGIES[field]
+        items = strategy.filter(items, query)
+
+    items = items.order_by(sort)
+
+    return render(request, "onlinelibrary/booklist.html", {
+        "items": items,
+    })
+
+
+

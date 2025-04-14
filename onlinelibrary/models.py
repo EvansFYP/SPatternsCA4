@@ -35,6 +35,7 @@ class BookTransaction(models.Model):
         ("borrow", "Borrow"),
     ]
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="transactions")
+    quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="transactions")
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
     transaction_date = models.DateTimeField(auto_now_add=True)

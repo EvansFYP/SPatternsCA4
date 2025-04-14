@@ -126,6 +126,29 @@ li a:hover:not(.active) {
   
 
     <h1>All Books <br>  <h2>Click on books to view their full details and purchase!</h2> </h1>
+    <form method="GET" action="{% url 'onlinelibrary:search' %}">
+        <input type="text" name="query" placeholder="Search books" value="{{ request.GET.query }}" />
+        
+        <select name="field">
+            <option value="title" {% if request.GET.field == "title" %}selected{% endif %}>Title</option>
+            <option value="category" {% if request.GET.field == "category" %}selected{% endif %}>Category</option>
+            <option value="author" {% if request.GET.field == "author" %}selected{% endif %}>Author</option>
+            <option value="publisher" {% if request.GET.field == "publisher" %}selected{% endif %}>Publisher</option>
+        </select>
+    
+        <select name="sort">
+            <option value="title" {% if request.GET.sort == "title" %}selected{% endif %}>Sort by Title (A-Z) ↑ </option>
+            <option value="-title" {% if request.GET.sort == "-title" %}selected{% endif %}>Sort by Title (Z-A)↓</option>
+            <option value="price" {% if request.GET.sort == "price" %}selected{% endif %}>Sort by Price ↑ (Low to high)</option>
+            <option value="-price" {% if request.GET.sort == "-price" %}selected{% endif %}>Sort by Price (High to low) ↓</option>
+            <option value="author" {% if request.GET.sort == "author" %}selected{% endif %}>Sort by Author (A-Z)↑</option>
+            <option value="-author" {% if request.GET.sort == "-author" %}selected{% endif %}>Sort by Author (Z-A) ↓</option>
+            <option value="category" {% if request.GET.sort == "category" %}selected{% endif %}>Sort by Category (A-Z) ↑</option>
+            <option value="-category" {% if request.GET.sort == "-category" %}selected{% endif %}>Sort by Category (Z-A) ↓</option>
+        </select>
+    
+        <button type="submit">Search</button>
+    </form>
    
     <div>
         {% for item in items %}
