@@ -39,5 +39,25 @@
             <a href="{% url 'onlinelibrary:itemdetail' item.id %}">Back to Item Details</a>
         </fieldset>
     </form>
+    <input type="hidden" id="original-stock" value="{{ item.stock_quantity }}">
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stockInput = document.querySelector('input[name="stock_quantity"]');
+        const originalStock = parseInt(document.getElementById('original-stock').value);
+        const publisherName = "{{ item.publisher.name|default:'Unknown Publisher' }}";
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function (e) {
+            const newStock = parseInt(stockInput.value);
+            if (newStock > originalStock) {
+                const confirmOrder = confirm(`Stock increased. Order from the publisher "${publisherName}"?`);
+                if (!confirmOrder) {
+                    e.preventDefault(); 
+                }
+            }
+        });
+    });
+</script>

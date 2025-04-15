@@ -341,3 +341,16 @@ def purchase_history(request):
     ).order_by('-transaction_date')
 
     return render(request, 'onlinelibrary/purchase_history.html', {'transactions': transactions})
+
+def admin_user_purchases(request):
+    users = UserProfile.objects.all()
+    user_purchases = {}
+
+    for user in users:
+        purchases = BookTransaction.objects.filter(user=user, status='COMPLETED')
+        if purchases.exists():
+            user_purchases[user] = purchases
+
+    return render(request, 'onlinelibrary/userhistory.html', {
+        'user_purchases': user_purchases,
+    }) 

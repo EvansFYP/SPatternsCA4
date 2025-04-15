@@ -1,0 +1,58 @@
+{% block content %}
+<h1>User Purchase Logs</h1>
+
+<style>
+    .user-section {
+        margin-bottom: 1em;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 0.5em;
+    }
+
+    .user-header {
+        cursor: pointer;
+        font-weight: bold;
+        background-color: #f4f4f4;
+        padding: 0.5em;
+        border-radius: 5px;
+    }
+
+    .purchase-list {
+        display: none;
+        padding: 0.5em;
+        margin-top: 0.5em;
+        background-color: #fafafa;
+    }
+</style>
+
+{% if user_purchases %}
+    {% for user, purchases in user_purchases.items %}
+        <div class="user-section">
+            <div class="user-header" onclick="togglePurchases('{{ user.id }}')">
+                {{ user.username }}
+            </div>
+            <div class="purchase-list" id="purchases-{{ user.id }}">
+                <ul>
+                    {% for purchase in purchases %}
+                        <li>
+                            {{ purchase.book.title }} – 
+                            {{ purchase.transaction_date|date:"Y-m-d H:i" }} – 
+                            Quantity: {{ purchase.quantity }} – 
+                            Price: €{{ purchase.price_at_transaction }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No purchases found.</p>
+{% endif %}
+
+<script>
+    function togglePurchases(userId) {
+        const section = document.getElementById('purchases-' + userId);
+        section.style.display = section.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

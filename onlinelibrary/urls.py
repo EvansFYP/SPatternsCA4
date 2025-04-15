@@ -25,5 +25,6 @@ path('finalise_purchase/', views.finalise_purchase, name='finalise_purchase'),
 path('loyalty/', views.loyalty_page, name='loyalty_page'),
 path('purchase-history/', views.purchase_history, name='purchase_history'),
 path('review/<int:book_id>/', views.review, name='review'),
+path('admin/user-purchases/', views.admin_user_purchases, name='admin_user_purchases'),
  
 ]
