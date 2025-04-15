@@ -8,7 +8,7 @@
                 Quantity: {{ transaction.quantity }}<br>
                 Purchased on: {{ transaction.transaction_date|date:"M d, Y H:i" }}<br>
 
-                <a href="{% url 'submit_review' transaction.book.id %}">Leave a Review</a>
+                <a href="{% url 'onlinelibrary:review' transaction.book.id %}">Leave a Review</a>
             </li>
         {% endfor %}
     </ul>

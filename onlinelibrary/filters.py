@@ -1,4 +1,9 @@
 
+from decimal import Decimal
+import re
+
+
+
 class BookFilterStrategy:
     def filter(self, queryset, query):
         raise NotImplementedError()
@@ -25,3 +30,7 @@ FILTER_STRATEGIES = {
     "author": AuthorFilter(),
     "publisher": PublisherFilter(),
 }
+
+
+
+

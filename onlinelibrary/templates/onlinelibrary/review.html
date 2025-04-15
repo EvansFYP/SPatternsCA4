@@ -9,7 +9,7 @@
 
     <p>How would you rate this book?</p>
 
-    <form method="POST" action="{% url 'submit_review' book.id %}">
+    <form method="POST" action="{% url 'onlinelibrary:review' book.id %}">
         {% csrf_token %}
         <label for="rating">Rating (1 to 5):</label>
         <select name="rating" id="rating">
@@ -28,6 +28,6 @@
         <button type="submit">Submit Review</button>
     </form>
 
-    <p><a href="{% url 'book_details' book.id %}">Back to Book Details</a></p>
+    <p><a href="{% url 'onlinelibrary:itemdetail' book.id %}">Back to Book Details</a></p>
 </body>
 </html>

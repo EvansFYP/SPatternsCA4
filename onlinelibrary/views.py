@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import login, authenticate
-from .models import AbstractUser
+from .models import AbstractUser, BookComment
 from django.contrib.auth.models import User
 from .factories import BookFactory  
 from .cart_service import CartService
@@ -20,6 +20,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from .filters import FILTER_STRATEGIES
 from django.contrib import messages
+from .discountandtransaction import BulkPurchaseDiscount, StaffDiscount, VisaPurchaseProcessor, MasterCardPurchaseProcessor
+ 
 
 
 from .models import UserProfile, Book, BookTransaction 
@@ -86,7 +88,7 @@ def custom_logout(request):
     logout(request)
 
    
-    return redirect('onlinelibrary:home')
+    return redirect('onlinelibrary:signin')
  
 def home(request): 
     if request.method == "GET":
@@ -121,13 +123,14 @@ def viewitem(request):
 def itemdetail(request, item_id):
     item = get_object_or_404(Book, id=item_id)
     related_books = Book.objects.filter(author=item.author).exclude(id=item.id)[:5]
+    comments = item.comments.select_related('user').order_by('-created_at')  
 
     context = { 
         'item': item,
         'related_books': related_books,
+        'comments': comments,
     }
-    
-    
+
     return render(request, 'onlinelibrary/itemdetail.html', context)
 
 
@@ -136,6 +139,8 @@ def deleteitem(request, item_id):
     if request.method == 'GET':
         item.delete()
         return redirect('onlinelibrary:viewitem')
+    
+
 
 def edititem(request, item_id):
     item = get_object_or_404(Book, id=item_id)
@@ -183,7 +188,7 @@ def edititem(request, item_id):
 
 
 
-cart_service = CartService()
+cart_service = CartService() # receiver
 
 def add_to_cart(request, item_id):
     book = get_object_or_404(Book, id=item_id)
@@ -218,7 +223,7 @@ def clear_cart(request):
 def view_cart(request):
     user = request.user
     cart_items = cart_service.get_cart_items(user)
-    
+
     total_price = Decimal("0.00")
     total_books = 0
 
@@ -226,18 +231,11 @@ def view_cart(request):
         total_price += item.price_at_transaction * item.quantity
         total_books += item.quantity
 
-    # Default discount logic
-    discount = Decimal("0.00")
-    discount_reason = ""
+    # Choose discount strategy
+  
+    discount_strategy = StaffDiscount() if user.is_staff else BulkPurchaseDiscount()
+    discount_amount, discount_reason = discount_strategy.calculate(user, total_price, total_books)
 
-    if user.is_staff:
-        discount = Decimal("0.20")
-        discount_reason = "Staff Discount (20%)"
-    elif total_books >= 3:
-        discount = Decimal("0.15")
-        discount_reason = "Bulk Purchase Discount (3+ books - 15%)"
-
-    discount_amount = (total_price * discount).quantize(Decimal("0.01"))
     final_price = total_price - discount_amount
 
     return render(request, 'onlinelibrary/cart.html', {
@@ -247,7 +245,6 @@ def view_cart(request):
         'discount_reason': discount_reason,
         'final_price': final_price,
     })
-
  
 
 
@@ -280,47 +277,21 @@ def finalise_purchase(request):
     user = request.user
 
     if request.method == "POST":
-        card_number = request.POST.get("card_number", "").replace(" ", "")
         method = (user.payment_method or "").lower()
 
-        visa_regex = re.compile(r"^4[0-9]{12}(?:[0-9]{3})?$")
-        master_regex = re.compile(r"^5[1-5][0-9]{14}$")
-
-        is_valid = False
         if method == "visa":
-            is_valid = bool(visa_regex.fullmatch(card_number))
+            processor = VisaPurchaseProcessor(request)
         elif method == "mastercard":
-            is_valid = bool(master_regex.fullmatch(card_number))
-
-        if not is_valid:
+            processor = MasterCardPurchaseProcessor(request)
+        else:
             return render(request, "onlinelibrary/confirmpurchase.html", {
-                "error": f"Invalid {method.title()} card number.",
-                "user": user
+                "user": user,
+                "error": f"Unsupported payment method: {method.title()}"
             })
 
-        # Proceed with purchase
-        active_transactions = BookTransaction.objects.select_related('book').filter(
-            user=user, status="ACTIVE"
-        )
+        return processor.execute()
 
-        for trans in active_transactions:
-            book = trans.book
-            if book.stock_quantity >= trans.quantity:
-                book.stock_quantity -= trans.quantity
-                book.save()
-
-                trans.status = "COMPLETED"
-                trans.save()
-            else:
-                print(f"Not enough stock for '{book.title}'. Purchase canceled.")
-                return redirect('onlinelibrary:view_cart')
-
-        # 
-        messages.success(request, "Purchase processed successfully. Thank you!")
-
-        return redirect('onlinelibrary:submit_review')
-
-    return render(request, 'onlinelibrary/confirmpurchase.html', {"user": user})
+    return render(request, "onlinelibrary/confirmpurchase.html", {"user": user})
 
 
 
@@ -341,18 +312,27 @@ def loyalty_page(request):
     })  
 
 
-def submit_review(request, book_id):
+def review(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
     if request.method == 'POST':
         rating = request.POST.get('rating')
+        review_text = request.POST.get('review_text', '').strip()
 
-        #update the book's average review rating
-        book.update_review(rating)
+        if rating:
+            book.update_review(rating)
 
-      
-        return redirect('itemdetail', book_id=book.id)  
+        if review_text:
+            BookComment.objects.create(
+                book=book,
+                user=request.user,
+                comment=review_text
+            )
 
+        return redirect('onlinelibrary:review', book_id=book.id)
+
+    return render(request, 'onlinelibrary/review.html', {'book': book}) 
+ 
 def purchase_history(request):
     transactions = BookTransaction.objects.filter(
         user=request.user,

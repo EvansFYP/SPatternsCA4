@@ -6,7 +6,7 @@ from .models import BookTransaction
 from django.utils import timezone
 
 class CartService:
-    _instance = None
+    _instance = None # singleton
 
     def __new__(cls):
         if cls._instance is None:
