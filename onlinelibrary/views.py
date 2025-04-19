@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import login, authenticate
+
+from .observer import LoyaltyObserver, StockObserver, Subject
 from .models import AbstractUser, BookComment
 from django.contrib.auth.models import User
 from .factories import BookFactory  
@@ -90,15 +92,22 @@ def custom_logout(request):
    
     return redirect('onlinelibrary:signin')
  
-def home(request): 
-    if request.method == "GET":
-        
-          
-        context = {}
-        return render(request, "onlinelibrary/home.html", context)
-    else:
-     
-         return HttpResponseRedirect(reverse("onlinelibrary:home"))
+def home(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        subject = Subject()
+        stock_observer = StockObserver()
+        subject.attach(stock_observer)
+
+        # check all books for low stock 
+        low_stock_books = Book.objects.filter(stock_quantity__lt=3)
+        subject.notify({
+            "event": "admin_visited",
+            "user": request.user,
+            "request": request,
+            "low_stock_books": low_stock_books,
+        })
+
+    return render(request, "onlinelibrary/home.html")
     
 
 
@@ -161,7 +170,7 @@ def edititem(request, item_id):
             item.image = request.FILES['image']
         
         item.save()
-        return redirect('onlinelibrary:itemdetail', item_id=item.id)  # Redirect to detail view after edit
+        return redirect('onlinelibrary:itemdetail', item_id=item.id)  # redirect to book detail view after edit
     
 
     categories = [  
@@ -190,18 +199,20 @@ def edititem(request, item_id):
 
 cart_service = CartService() # receiver
 
+executed_commands = {}  # TEMPORARY dictionary 
+
 def add_to_cart(request, item_id):
     book = get_object_or_404(Book, id=item_id)
-    user = request.user  
-    # create the AddToCartCommand
+    user = request.user
+
     add_command = AddToCartCommand(cart_service, user, book)
+    invoker = CartInvoker()
+    invoker.execute_command(add_command)
 
-    # create an Invoker and execute the command
-    invoker = CartInvoker()  
-    invoker.execute_command(add_command)  # executes the command through the invoker
+    # store the command for rollback (e.g keyed by user ID)
+    executed_commands[user.id] = add_command 
 
- 
-    return redirect('onlinelibrary:view_cart')
+    return redirect('onlinelibrary:viewitem')
 
 
 
@@ -231,8 +242,7 @@ def view_cart(request):
         total_price += item.price_at_transaction * item.quantity
         total_books += item.quantity
 
-    # Choose discount strategy
-  
+    
     discount_strategy = StaffDiscount() if user.is_staff else BulkPurchaseDiscount()
     discount_amount, discount_reason = discount_strategy.calculate(user, total_price, total_books)
 
@@ -244,17 +254,26 @@ def view_cart(request):
         'discount': discount_amount,
         'discount_reason': discount_reason,
         'final_price': final_price,
-    })
- 
+    }) 
 
 
 def remove_from_cart(request, item_id):
-    remove_command = RemoveFromCartCommand(cart_service, request.user, item_id)
-    invoker = CartInvoker()
-    invoker.execute_command(remove_command)
+    user = request.user
+    cart_item = get_object_or_404(BookTransaction, id=item_id, user=request.user, status="ACTIVE")
+    book = cart_item.book
+
+    #  rollback if a free book was used
+    last_command = executed_commands.get(user.id)
+    if isinstance(last_command, AddToCartCommand) and last_command.book == book:
+        last_command.undo()
+        del executed_commands[user.id]  # clear it after undoing
+    else:
+        # fallback: regular remove
+        cart_service.remove_from_cart(user, item_id)
+
     return redirect('onlinelibrary:view_cart')
  
-#Strategy Pattern
+#Strategy Pattern 
 def search_books(request):
     query = request.GET.get("query", "")
     field = request.GET.get("field", "title")
@@ -279,6 +298,7 @@ def finalise_purchase(request):
     if request.method == "POST":
         method = (user.payment_method or "").lower()
 
+        # Create processor
         if method == "visa":
             processor = VisaPurchaseProcessor(request)
         elif method == "mastercard":
@@ -289,10 +309,14 @@ def finalise_purchase(request):
                 "error": f"Unsupported payment method: {method.title()}"
             })
 
+        # Attach observers 
+        processor.subject.attach(LoyaltyObserver())
+        processor.subject.attach(StockObserver())
+
         return processor.execute()
 
     return render(request, "onlinelibrary/confirmpurchase.html", {"user": user})
-
+ 
 
 
 def loyalty_page(request):
@@ -332,6 +356,21 @@ def review(request, book_id):
         return redirect('onlinelibrary:review', book_id=book.id)
 
     return render(request, 'onlinelibrary/review.html', {'book': book}) 
+
+def claim_free_book(request):
+    user_profile = request.user
+    
+    if user_profile.loyalty_count >= 10 and not user_profile.free_book:
+        user_profile.free_book = True  # marks the free book as claimed
+        user_profile.loyalty_count = 0  # Reset loyalty count
+        user_profile.save()
+        messages.success(request, 'You have successfully claimed your free book!')
+    elif user_profile.free_book:
+        messages.warning(request, 'You have already claimed your free book.')
+    else:
+        messages.error(request, 'You need at least 10 purchases to claim a free book.')
+
+    return redirect('onlinelibrary:loyalty_page')
  
 def purchase_history(request):
     transactions = BookTransaction.objects.filter(
@@ -354,3 +393,4 @@ def admin_user_purchases(request):
     return render(request, 'onlinelibrary/userhistory.html', {
         'user_purchases': user_purchases,
     }) 
+

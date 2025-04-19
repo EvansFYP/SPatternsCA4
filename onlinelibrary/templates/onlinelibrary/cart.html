@@ -28,7 +28,7 @@
         background-color: #e76f51;
     }
     
-    /* Cart Layout */
+   
     .cart-container {
         max-width: 800px;
         margin: 30px auto;
@@ -81,53 +81,62 @@
         margin-top: 10px;
     }
     </style>
-    
+
     <ul>
-        <li><a href="#user">User: Signed in as {{ request.user }}</a></li>
-        <li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
-        <li><a href="{% url 'onlinelibrary:home' %}">Home </a></li>
-        <li><a href="#Search">Search Books</a></li>
-        <li><a href="{% url 'onlinelibrary:view_cart' %}">Shopping Cart</a></li>
+    <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
+    <li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
+    <li><a href="{% url 'onlinelibrary:home' %}">Home</a></li>
+    <li><a href="{% url 'onlinelibrary:viewitem' %}">View Books</a></li>
+    <li><a href="{% url 'onlinelibrary:view_cart' %}">Shopping Cart</a></li>
+    <li><a href="{% url 'onlinelibrary:loyalty_page' %}">Loyalty Rewards</a></li>
+    <li><a href="{% url 'onlinelibrary:purchase_history' %}">Purchase History</a></li>
+    {% if request.user.is_staff %}
+    <li><a href="{% url 'onlinelibrary:admin_user_purchases' %}">User Logs</a></li>
+    {% endif %}
     </ul>
     
     <div class="cart-container">
         <h2>Your Cart</h2>
     
         {% if cart_items %}
-            {% for item in cart_items %}
-                <div class="cart-item">
-                    {% if item.book.image %}
-                        <img src="{{ item.book.image.url }}" alt="{{ item.book.title }} cover">
+        {% for item in cart_items %}
+            <div class="cart-item">
+                {% if item.book.image %}
+                    <img src="{{ item.book.image.url }}" alt="{{ item.book.title }} cover">
+                {% endif %}
+                <div class="cart-item-details">
+                    <strong>{{ item.book.title }}</strong><br>
+                    {% if item.price_at_transaction == 0 %}
+                        <span>Free Book</span>
+                    {% else %}
+                        €{{ item.price_at_transaction }}
                     {% endif %}
-                    <div class="cart-item-details">
-                        <strong>{{ item.book.title }}</strong><br>
-                        €{{ item.price_at_transaction }} (x{{ item.quantity }})
-                        <form method="post" action="{% url 'onlinelibrary:remove_from_cart' item.id %}">
-                            {% csrf_token %}
-                            <button type="submit">Remove</button>
-                        </form>
-                    </div>
+                    (x{{ item.quantity }})
+                    <form method="post" action="{% url 'onlinelibrary:remove_from_cart' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Remove</button>
+                    </form>
                 </div>
-            {% endfor %}
+            </div>
+        {% endfor %}
     
-            <p class="total-price">Total: €{{ total_price }}</p>
-
-            {% if discount > 0 %}
-    <p class="discount-info">Discount: -€{{ discount }} ({{ discount_reason }})</p>
-    <p class="final-price"><strong>Final Price: €{{ final_price }}</strong></p>
-            {% else %}
-    <p class="final-price"><strong>Final Price: €{{ total_price }}</strong></p>
-            {% endif %}
+        <p class="total-price">Total: €{{ total_price }}</p>
     
-            <form method="post" action="{% url 'onlinelibrary:clear_cart' %}">
-                {% csrf_token %}
-                <button class="clear-cart-btn" type="submit">Clear Cart</button>
-            </form>
-            <form method="post" action="{% url 'onlinelibrary:finalise_purchase' %}">
-                {% csrf_token %}
-                <button class="purchase" type="submit">Purchase</button>
-            </form>
+        {% if discount > 0 %}
+            <p class="discount-info">Discount: -€{{ discount }} ({{ discount_reason }})</p>
+            <p class="final-price"><strong>Final Price: €{{ final_price }}</strong></p>
         {% else %}
-            <p>Your cart is empty.</p>
+            <p class="final-price"><strong>Final Price: €{{ total_price }}</strong></p>
         {% endif %}
-    </div>
+    
+        <form method="post" action="{% url 'onlinelibrary:clear_cart' %}">
+            {% csrf_token %}
+            <button class="clear-cart-btn" type="submit">Clear Cart</button>
+        </form>
+        <form method="post" action="{% url 'onlinelibrary:finalise_purchase' %}">
+            {% csrf_token %}
+            <button class="purchase" type="submit">Purchase</button>
+        </form>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}

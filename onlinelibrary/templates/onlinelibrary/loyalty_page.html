@@ -1,5 +1,50 @@
 <html>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            color: #333;
+        }
 
+        h1 {
+            color: #2c3e50;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 5px 0;
+            font-size: 16px;
+        }
+
+        li::before {
+            content: "-> ";
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #219150;
+        }
+
+        form, p {
+            margin-top: 20px;
+        }
+    </style>
+
+    
 <head>
 
     <title>Loyalty Page</title>
@@ -20,7 +65,7 @@
     </ul>
 
     {% if free_book_button %}
-        <form method="POST" action="{% url 'redeem_free_book' %}">
+        <form method="POST" action="{% url 'onlinelibrary:claim_free_book' %}">
             {% csrf_token %}
             <button type="submit">Redeem Your Free Book</button>
         </form>
@@ -28,4 +73,7 @@
         <p>Keep buying books to reach 10 and get a free book!</p>
     {% endif %}
 </body>
+
+<a href="{% url 'onlinelibrary:home' %}">Home</a>
+
 </html>

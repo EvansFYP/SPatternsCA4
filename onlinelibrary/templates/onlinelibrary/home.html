@@ -70,7 +70,7 @@ li a:hover:not(.active) {
 <ul>
 <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
 <li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
-<li><a class="active" href="#home">Home</a></li>
+<li><a href="{% url 'onlinelibrary:home' %}">Home</a></li>
 <li><a href="{% url 'onlinelibrary:viewitem' %}">View Books</a></li>
 <li><a href="{% url 'onlinelibrary:view_cart' %}">Shopping Cart</a></li>
 <li><a href="{% url 'onlinelibrary:loyalty_page' %}">Loyalty Rewards</a></li>
@@ -123,4 +123,6 @@ li a:hover:not(.active) {
   {% endfor %}
 </ul>
 {% endif %}
+
+
 </body>

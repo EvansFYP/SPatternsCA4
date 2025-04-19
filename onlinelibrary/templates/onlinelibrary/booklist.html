@@ -116,9 +116,15 @@ li a:hover:not(.active) {
     <head>
         <ul>
             <li><a href="#user">User  : Signed in as {{request.user}}</a></li>
-            <li><a class="active" href="{% url 'onlinelibrary:home' %}">Home</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#about">About</a></li>
+            <li><a href="{% url 'onlinelibrary:logout' %}">Log Out</a></li>
+            <li><a href="{% url 'onlinelibrary:home' %}">Home</a></li>
+            <li><a href="{% url 'onlinelibrary:viewitem' %}">View Books</a></li>
+            <li><a href="{% url 'onlinelibrary:view_cart' %}">Shopping Cart</a></li>
+            <li><a href="{% url 'onlinelibrary:loyalty_page' %}">Loyalty Rewards</a></li>
+             <li><a href="{% url 'onlinelibrary:purchase_history' %}">Purchase History</a></li>
+{% if request.user.is_staff %}
+<li><a href="{% url 'onlinelibrary:admin_user_purchases' %}">User Logs</a></li>
+{% endif %}
             </ul>
     </head>
   

@@ -10,6 +10,7 @@ class UserProfile(AbstractUser):  #
     groups = models.ManyToManyField(Group, related_name="user_profiles", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="user_profiles", blank=True)
     loyalty_count = models.IntegerField(default=0)
+    free_book = models.BooleanField(default = False)
 
 
 class Book(models.Model):

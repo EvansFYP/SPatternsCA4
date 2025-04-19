@@ -26,5 +26,6 @@ path('loyalty/', views.loyalty_page, name='loyalty_page'),
 path('purchase-history/', views.purchase_history, name='purchase_history'),
 path('review/<int:book_id>/', views.review, name='review'),
 path('admin/user-purchases/', views.admin_user_purchases, name='admin_user_purchases'),
- 
+path('claim-free-book/', views.claim_free_book, name='claim_free_book'), 
+
 ]
